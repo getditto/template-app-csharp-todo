@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using DittoSDK;
+using System.Text.Json;
 
 namespace Tasks
 {
     public struct Task
     {
-        string _id;
-        string body;
-        bool isCompleted;
-        bool isDeleted;
+        public string _id { get; set; }
+        public string body { get; set; }
+        public bool isCompleted { get; set; }
+        public bool isDeleted { get; set; }
 
-        public Task(string _id, string body, bool isCompleted, bool isDeleted)
+        public static Task JsonToTask(string jsonString)
         {
-            this._id = _id;
-            this.body = body;
-            this.isCompleted = isCompleted;
-            this.isDeleted = isDeleted;
+            return JsonSerializer.Deserialize<Task>(jsonString);
         }
 
         public Task(string body, bool isCompleted)
@@ -25,14 +22,6 @@ namespace Tasks
             this.body = body;
             this.isCompleted = isCompleted;
             this.isDeleted = false;
-        }
-
-        public Task(DittoDocument document)
-        {
-            this._id = document["_id"].StringValue;
-            this.body = document["body"].StringValue;
-            this.isCompleted = document["isCompleted"].BooleanValue;
-            this.isDeleted = document["isDeleted"].BooleanValue;
         }
 
         public override string ToString()
