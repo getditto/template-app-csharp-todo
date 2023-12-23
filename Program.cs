@@ -1,6 +1,7 @@
 ﻿using System;
 using DittoSDK;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Tasks
 {
@@ -56,38 +57,44 @@ namespace Tasks
                         var task = new Task(taskBody, false).ToDictionary();
                         await ditto.Store.ExecuteAsync("INSERT INTO tasks DOCUMENTS (:task)", new Dictionary<string, object> { { "task", task } });
                         break;
+
                     case string s when command.StartsWith("--toggle"):
                         string _idToToggle = s.Replace("--toggle ", "");
-                        await ditto.Store.ExecuteAsync("SELECT * FROM tasks WHERE _id == :id", new Dictionary<string, object> { { "id", _idToToggle } }).ContinueWith((result) =>
-                        {
-                            var task = result.Result.Items[0];
-                            var isCompleted = Task.JsonToTask(task.JsonString()).isCompleted;
-                            ditto.Store.ExecuteAsync("UPDATE tasks SET isCompleted = :toggledValue WHERE _id == :id", new Dictionary<string, object> { { "id", _idToToggle }, { "toggledValue", !isCompleted } });
-                        });
+                        var isCompleted = tasks.First(t => t._id == _idToToggle).isCompleted;
+                        await ditto.Store.ExecuteAsync(
+                            "UPDATE tasks " +
+                            "SET isCompleted = :newValue " +
+                            "WHERE _id == :id",
+                            new Dictionary<string, object> {{ "newValue", !isCompleted }, { "id", _idToToggle }});
                         break;
+
                     case string s when command.StartsWith("--delete"):
                         string _idToDelete = s.Replace("--delete ", "");
-                        await ditto.Store.ExecuteAsync("SELECT * FROM tasks WHERE _id == :id", new Dictionary<string, object> { { "id", _idToDelete } }).ContinueWith((result) =>
-                        {
-                            var task = result.Result.Items[0];
-                            var isDeleted = Task.JsonToTask(task.JsonString()).isDeleted;
-                            ditto.Store.ExecuteAsync("UPDATE tasks SET isDeleted = :toggledValue WHERE _id == :id", new Dictionary<string, object> { { "id", _idToDelete }, { "toggledValue", !isDeleted } });
-                        });
+                        var isDeleted = tasks.First(t => t._id == _idToDelete).isDeleted;
+                        await ditto.Store.ExecuteAsync(
+                            "UPDATE tasks " +
+                            "SET isDeleted = :newValue " +
+                            "WHERE _id == :id",
+                            new Dictionary<string, object> {{ "newValue", !isDeleted }, { "id", _idToDelete }});
                         break;
+
                     case { } when command.StartsWith("--list"):
                         tasks.ForEach(task =>
                         {
                             Console.WriteLine(task.ToString());
                         });
                         break;
+
                     case { } when command.StartsWith("--exit"):
                         Console.WriteLine("Good bye!");
                         isAskedToExit = true;
                         break;
+
                     default:
                         Console.WriteLine("Unknown command");
                         ListCommands();
                         break;
+
                 }
             }
         }
