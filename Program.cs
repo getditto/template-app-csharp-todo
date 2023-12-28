@@ -14,6 +14,7 @@ namespace Tasks
         public static async System.Threading.Tasks.Task Main(params string[] args)
         {
             ditto = new Ditto(identity: DittoIdentity.OnlinePlayground("REPLACE_ME_WITH_YOUR_APP_ID", "REPLACE_ME_WITH_YOUR_PLAYGROUND_TOKEN"));
+            ditto.DisableSyncWithV3();
 
             try
             {
