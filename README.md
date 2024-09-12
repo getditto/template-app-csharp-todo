@@ -1,6 +1,6 @@
 # template-app-csharp-todo
 
-Read the full documentation on [ditto.live](https://docs.ditto.live/csharp-installing)
+Read the full documentation on [ditto.live](https://docs.ditto.live/install-guides/c-sharp)
 
 1. Copy your Ditto AppID and token from the [Ditto Portal](https://portal.ditto.live/) 
 to `Program.cs`
